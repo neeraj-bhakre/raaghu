@@ -22,7 +22,7 @@
     "@angular/core": "13.2.0",
     "@angular/forms": "13.2.0",
     "@angular/platform-browser": "13.2.0",
-    "@angular/platform-browser-dynamic": "13.2.0",
+    "@angular/platform-browser-dynamic": "15.0.4",
     "@angular/router": "13.2.0",
     "@scarf/scarf": "^1.1.1",
     "@types/bootstrap": "^5.1.10",
