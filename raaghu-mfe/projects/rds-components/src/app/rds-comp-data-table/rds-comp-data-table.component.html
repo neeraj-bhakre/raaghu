@@ -107,13 +107,16 @@
                   {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
 
               </ng-container>
-              <ng-container *ngSwitchCase="'html'">
+              <!-- <ng-container *ngSwitchCase="'html'">
                 <rds-input required [(ngModel)]="data[column.key]" [value]="data[column.key]"
                   [disabled]="column.disabled" [inputType]="'text'" ngDefaultControl>
                 </rds-input>
                 <small class="error" *ngIf="column.required&&(data[column.key]===''||!data[column.key])">
                   {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
+              </ng-container> -->
 
+              <ng-container *ngSwitchCase="'html'">
+                <td [innerHTML]="data[column.key]" class="align-middle"></td>
               </ng-container>
             </ng-container>
           </ng-template>
@@ -284,10 +287,10 @@
       <div class="d-flex d-flex justify-content-center">
         <ng-container *ngFor="let action of data.actions">
           <rds-button [colorVariant]="'default'" [submit]="false" [block]="false" [size]="'small'" [isIconFill]="false"
-          [isDisabled]="false" [isOutline]="true" [isFabIcon]="true" [icon]="action.icon" [iconHeight]="'16px'" 
-          [attr.aria-label]="'Update'+action.displayName+subData?.name"
-          [iconWidth]="'16px'" tooltipTitle="" tooltipPlacement="bottom" (click)="onActionSelect(action,subData)"
-          [attr.id]="'action-dropdown'+i+id" ></rds-button>
+            [isDisabled]="false" [isOutline]="true" [isFabIcon]="true" [icon]="action.icon" [iconHeight]="'16px'"
+            [attr.aria-label]="'Update'+action.displayName+subData?.name" [iconWidth]="'16px'" tooltipTitle=""
+            tooltipPlacement="bottom" (click)="onActionSelect(action,subData)"
+            [attr.id]="'action-dropdown'+i+id"></rds-button>
 
           <!-- <rds-button colorVariant="default" [size]="'small'" [isFabIcon]="true" tooltipTitle="This is tooltip" 
           tooltipPlacement="right" buttonId="" iconHeight="18px" iconWidth="18px" [isIconFill]="false" icon="plus">
@@ -296,12 +299,12 @@
           <rds-button (click)="onActionSelect(action,subData)"  [attr.aria-label]="'Update'+action.displayName+subData?.name" [size]="'small'"
           class="px-2" [colorVariant]="'primary'" [isOutline]="true"  data-bs-dismiss="modal" aria-label="Close">
       </rds-button> -->
-      <!-- <rds-button [label]="translate.instant('Delete')"  [size]="'small'" class="px-2" [colorVariant]="'primary'"
+          <!-- <rds-button [label]="translate.instant('Delete')"  [size]="'small'" class="px-2" [colorVariant]="'primary'"
       (click)="onActionSelect(action,subData)" data-bs-dismiss="modal" aria-label="Close">
       </rds-button> -->
         </ng-container>
-        
-    </div>
+
+      </div>
       <ng-container *ngIf="showConfirmationPopup">
         <rds-comp-alert-popup [alertID]="'deleteModal'" (onCancel)="close()" (onSuccess)="delete()"
           [alertData]="alertData">
@@ -318,7 +321,7 @@
           </rds-button>
         </div>
       </ng-template>
-       </td>
+    </td>
   </tr>
   </ng-container>
   </tbody>
