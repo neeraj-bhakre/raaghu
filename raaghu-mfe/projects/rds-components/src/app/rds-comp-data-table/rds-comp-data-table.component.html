@@ -9,6 +9,7 @@
               <rds-checkbox [checked]="isAllCheckBoxChecked()" (change)="checkAllCheckBox($event)"></rds-checkbox>
             </th>
             <ng-container *ngFor="let header of tableHeaders;let i=index">
+              <th *ngIf="header.dataType.toLowerCase()==='expand'">&nbsp;</th>
               <th scope="col" [class.sortable]="header.sortable" [ngStyle]="{'width': header.colWidth}">
                 <div class="header d-flex">
                   <span>{{translate.instant(header.displayName)}}</span>
@@ -49,68 +50,78 @@
           </tr>
         </thead>
         <tbody *ngIf="tableData&&tableData.length>0">
-          <tr *ngFor="let data of dataSource; let i=index" (click)="onSelectData(data)">
-            <td *ngIf="enableCheckboxSelection">
-              <rds-checkbox [checked]="data.checked" (change)="changeCheckbox(data,$event)"></rds-checkbox>
-            </td>
-            <ng-container *ngFor="let column of tableHeaders">
-              <ng-container *ngIf="column.dataType.toLowerCase()==='html'&&!data.isEdit; else iconTemplate">
+          <ng-container *ngFor="let data of dataSource; let i=index">
+            <tr (click)="onSelectData(data)">
+              <td *ngIf="enableCheckboxSelection">
+                <rds-checkbox [checked]="data.checked" (change)="changeCheckbox(data,$event)"></rds-checkbox>
+              </td>
+
+              <ng-container *ngFor="let column of tableHeaders">
+                <td (click)="data.expanded = !data.expanded" *ngIf="column.dataType.toLowerCase()==='expand'">
+                  <span *ngIf="!data.expanded">+</span>
+                  <span *ngIf="data.expanded">-</span>
+                </td>
+                <ng-container *ngIf="column.dataType.toLowerCase()==='html'&&!data.isEdit; else iconTemplate">
+                  <td [innerHTML]="data[column.key]" class="align-middle"></td>
+                </ng-container>
+                <ng-template #iconTemplate>
+                  <ng-container *ngIf="column.dataType.toLowerCase()==='icon'&&!data.isEdit; else nonTemplateData">
+                    <td>
+                      <rds-icon [name]="data[column.key].icon" [width]="data[column.key].width"
+                        [colorVariant]="data[column.key].colorVariant" [height]="data[column.key].height"></rds-icon>
+                    </td>
+                  </ng-container>
+                </ng-template>
+                <ng-template #nonTemplateData>
+                  <td class="align-middle">
+                    <ng-container *ngIf="!data.isEdit; else editTemplate">
+                      <ng-container
+                        *ngIf="column.dataType.toLowerCase()==='radio'&&!data.isEdit; else otherRadioTemplate">
+                  <td>
+                    <rds-radio-button ngDefaultControl [itemList]="data[column.key]" (onClick)="getRadioValue($event)"
+                      display_type="Horizontal"></rds-radio-button>
+                  </td>
+              </ng-container>
+              <small class="error" *ngIf="column.required&&(data[column.key]===''||!data[column.key])">
+                {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
+              <ng-template #otherRadioTemplate>
+                {{data[column.key]}}
+              </ng-template>
+          </ng-container>
+          <ng-template #editTemplate>
+            <ng-container [ngSwitch]="column.dataType.toLowerCase()">
+              <ng-container *ngSwitchCase="'number'">
+                <rds-input [(ngModel)]="data[column.key]" #numberField="ngModel" [disabled]="column.disabled"
+                  [value]="data[column.key]" [inputType]="'number'" ngDefaultControl>
+                </rds-input>
+                <small class="error"
+                  *ngIf="(numberField.dirty || numberField.touched)&&column.required&&(data[column.key]===''||data[column.key]===undefined)">
+                  {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
+              </ng-container>
+              <ng-container *ngSwitchCase="'text'">
+                <rds-input required [(ngModel)]="data[column.key]" [value]="data[column.key]"
+                  [disabled]="column.disabled" [placeholder]=column.displayName #textField="ngModel"
+                  [inputType]="'text'" ngDefaultControl></rds-input>
+                <small class="error"
+                  *ngIf="(textField.dirty || textField.touched)&&column.required&&(data[column.key]===''||!data[column.key])">
+                  {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
+
+              </ng-container>
+              <!-- <ng-container *ngSwitchCase="'html'">
+                <rds-input required [(ngModel)]="data[column.key]" [value]="data[column.key]"
+                  [disabled]="column.disabled" [inputType]="'text'" ngDefaultControl>
+                </rds-input>
+                <small class="error" *ngIf="column.required&&(data[column.key]===''||!data[column.key])">
+                  {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
+              </ng-container> -->
+
+              <ng-container *ngSwitchCase="'html'">
                 <td [innerHTML]="data[column.key]" class="align-middle"></td>
               </ng-container>
-              <ng-template #iconTemplate>
-                <ng-container *ngIf="column.dataType.toLowerCase()==='icon'&&!data.isEdit; else nonTemplateData">
-                  <td>
-                    <rds-icon [name]="data[column.key].icon" [width]="data[column.key].width"
-                      [colorVariant]="data[column.key].colorVariant" [height]="data[column.key].height"></rds-icon>
-                  </td>
-                </ng-container>
-              </ng-template>
-              <ng-template #nonTemplateData>
-                <td class="align-middle">
-                  <ng-container *ngIf="!data.isEdit; else editTemplate">
-                    <ng-container
-                      *ngIf="column.dataType.toLowerCase()==='radio'&&!data.isEdit; else otherRadioTemplate">
-                <td>
-                  <rds-radio-button ngDefaultControl [itemList]="data[column.key]" (onClick)="getRadioValue($event)"
-                    display_type="Horizontal"></rds-radio-button>
-                </td>
             </ng-container>
-            <small class="error" *ngIf="column.required&&(data[column.key]===''||!data[column.key])">
-              {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
-            <ng-template #otherRadioTemplate>
-              {{data[column.key]}}
-            </ng-template>
-  </ng-container>
-  <ng-template #editTemplate>
-    <ng-container [ngSwitch]="column.dataType.toLowerCase()">
-      <ng-container *ngSwitchCase="'number'">
-        <rds-input [(ngModel)]="data[column.key]" #numberField="ngModel" [disabled]="column.disabled"
-          [value]="data[column.key]" [inputType]="'number'" ngDefaultControl>
-        </rds-input>
-        <small class="error"
-          *ngIf="(numberField.dirty || numberField.touched)&&column.required&&(data[column.key]===''||data[column.key]===undefined)">
-          {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
-      </ng-container>
-      <ng-container *ngSwitchCase="'text'">
-        <rds-input required [(ngModel)]="data[column.key]" [value]="data[column.key]" [disabled]="column.disabled"
-          [placeholder]=column.displayName #textField="ngModel" [inputType]="'text'" ngDefaultControl></rds-input>
-        <small class="error"
-          *ngIf="(textField.dirty || textField.touched)&&column.required&&(data[column.key]===''||!data[column.key])">
-          {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
-
-      </ng-container>
-      <ng-container *ngSwitchCase="'html'">
-        <rds-input required [(ngModel)]="data[column.key]" [value]="data[column.key]" [disabled]="column.disabled"
-          [inputType]="'text'" ngDefaultControl>
-        </rds-input>
-        <small class="error" *ngIf="column.required&&(data[column.key]===''||!data[column.key])">
-          {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
-
-      </ng-container>
-    </ng-container>
-  </ng-template>
-  </td>
-  </ng-template>
+          </ng-template>
+          </td>
+          </ng-template>
   </ng-container>
   <td *ngIf="actions.length>0" class="align-middle text-center">
     <!-- <div class="d-flex align-items-center"> -->
@@ -146,8 +157,178 @@
     </ng-template>
     <!-- </div> -->
   </td>
-
   </tr>
+  <tr *ngIf="data.expanded" [@expand]>
+    <td colspan="6">
+      <table class="table table-hover table-bordered h-100" id="sortTable" [class]="classes"
+        [ngStyle]="{'width': width}">
+        <thead>
+          <tr>
+            <ng-container *ngFor="let header of data.children;let i=index">
+              <th scope="col" [class.sortable]="header.sortable" [ngStyle]="{'width': header.colWidth}">
+                <div class="header d-flex">
+                  <span>{{translate.instant(header.displayName)}}</span>
+                  <div class="header-options mobile-header-option cursor-pointer ps-1">
+                    <span (click)="sortByColumn(header)" class="text-right sort-icons mobile-sort"
+                      *ngIf="header.sortable">
+                      <rds-icon [name]="'up'" [width]="'12px'" [height]="'12px'"
+                        [ngClass]="getDescIconClass(header)"></rds-icon>
+                      <rds-icon [name]="'down'" [width]="'12px'" [height]="'12px'"
+                        [ngClass]="getAscIconClass(header)"></rds-icon>
+                    </span>
+                    <div class="btn-group dropend">
+                      <span class="text-right sort-icons sortable" [id]="'search-dropdown'+i+id"
+                        (click)="openSearchModal(i)" *ngIf="header.filterable" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <rds-icon [name]="'filter'" [height]="'12px'" [width]="'12px'">
+                        </rds-icon>
+                      </span>
+                      <ul class="dropdown-menu searchModal p-1 border-0"
+                        [attr.aria-labelledby]="'search-dropdown'+i+id">
+                        <div>
+                          <div>
+                            <rds-input [placeholder]="translate.instant('Search here')+' ...'"
+                              [inputType]="header.dataType" [icon]="'search'" [name]="header.key" [size]="'small'"
+                              [(ngModel)]="header[header.key+'Filter']" ngDefaultControl
+                              (keyup)="onKeyup($event,header)"></rds-input>
+                          </div>
+                        </div>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </th>
+            </ng-container>
+            <th *ngIf="data.children&&data.children.length>0&&actions&&actions.length>0"
+              class="text-center subActionStyle">
+              {{translate.instant("Actions")}}
+            </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="data.childrens&&data.childrens.length>0">
+          <ng-container *ngFor="let subData of data.childrens; let i=index">
+            <tr (click)="onSelectData(subData)">
+              <ng-container *ngFor="let column of data.children">
+                <ng-container *ngIf="column.dataType.toLowerCase()==='html'&&!subData.isEdit; else iconTemplate">
+                  <td [innerHTML]="subData[column.key]" class="align-middle"></td>
+                </ng-container>
+                <ng-template #iconTemplate>
+                  <ng-container *ngIf="column.dataType.toLowerCase()==='icon'&&!subData.isEdit; else nonTemplateData">
+                    <td>
+                      <rds-icon [name]="subData[column.key].icon" [width]="subData[column.key].width"
+                        [colorVariant]="subData[column.key].colorVariant"
+                        [height]="subData[column.key].height"></rds-icon>
+                    </td>
+                  </ng-container>
+                </ng-template>
+                <ng-template #nonTemplateData>
+                  <td class="align-middle">
+                    <ng-container *ngIf="!subData.isEdit; else editTemplate">
+                      <ng-container
+                        *ngIf="column.dataType.toLowerCase()==='radio'&&!subData.isEdit; else otherRadioTemplate">
+                  <td>
+                    <rds-radio-button ngDefaultControl [itemList]="subData[column.key]"
+                      (onClick)="getRadioValue($event)" display_type="Horizontal"></rds-radio-button>
+                  </td>
+              </ng-container>
+              <small class="error" *ngIf="column.required&&(subData[column.key]===''||!subData[column.key])">
+                {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
+              <ng-template #otherRadioTemplate>
+                {{subData[column.key]}}
+              </ng-template>
+          </ng-container>
+          <ng-template #editTemplate>
+            <ng-container [ngSwitch]="column.dataType.toLowerCase()">
+              <ng-container *ngSwitchCase="'number'">
+                <rds-input [(ngModel)]="subData[column.key]" #numberField="ngModel" [disabled]="column.disabled"
+                  [value]="subData[column.key]" [inputType]="'number'" ngDefaultControl>
+                </rds-input>
+                <small class="error"
+                  *ngIf="(numberField.dirty || numberField.touched)&&column.required&&(subData[column.key]===''||subData[column.key]===undefined)">
+                  {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
+              </ng-container>
+              <ng-container *ngSwitchCase="'text'">
+                <rds-input required [(ngModel)]="subData[column.key]" [value]="subData[column.key]"
+                  [disabled]="column.disabled" [placeholder]=column.displayName #textField="ngModel"
+                  [inputType]="'text'" ngDefaultControl></rds-input>
+                <small class="error"
+                  *ngIf="(textField.dirty || textField.touched)&&column.required&&(subData[column.key]===''||!subData[column.key])">
+                  {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
+
+              </ng-container>
+              <ng-container *ngSwitchCase="'html'">
+                <rds-input required [(ngModel)]="subData[column.key]" [value]="subData[column.key]"
+                  [disabled]="column.disabled" [inputType]="'text'" ngDefaultControl>
+                </rds-input>
+                <small class="error" *ngIf="column.required&&(subData[column.key]===''||!subData[column.key])">
+                  {{translate.instant(column.displayName)}} {{translate.instant('is required')}}</small>
+
+              </ng-container>
+            </ng-container>
+          </ng-template>
+    </td>
+    </ng-template>
+    </ng-container>
+    <td *ngIf="actions.length>0" class="align-middle text-center subActionStyle">
+      <!-- <div class="dropdown" *ngIf="!subData.isEdit; else editActionTemplate">
+        <rds-button [colorVariant]="'default'" [submit]="false" [block]="false" [size]="'small'" [isIconFill]="true"
+          [isDisabled]="false" [isOutline]="true" [isFabIcon]="true" icon="three_dots" [iconHeight]="'16px'"
+          [iconWidth]="'16px'" tooltipTitle="" tooltipPlacement="bottom" (click)="openAction(i)"
+          [attr.id]="'action-dropdown'+i+id" data-bs-toggle="dropdown" aria-expanded="false"></rds-button>
+        <div class="dropdown-menu" [attr.aria-labelledby]="'action-dropdown'+i+id">
+          <ng-container *ngFor="let action of actions">
+            <li>
+              <a class="dropdown-item" [attr.aria-label]="'Update'+action.displayName+subData?.name"
+                (click)="onActionSelect(action,subData)">{{translate.instant(action.displayName)}}</a>
+            </li>
+          </ng-container>
+        </div>
+      </div> -->
+      <div class="d-flex d-flex justify-content-center">
+        <ng-container *ngFor="let action of data.actions">
+          <rds-button [colorVariant]="'default'" [submit]="false" [block]="false" [size]="'small'" [isIconFill]="false"
+            [isDisabled]="false" [isOutline]="true" [isFabIcon]="true" [icon]="action.icon" [iconHeight]="'16px'"
+            [attr.aria-label]="'Update'+action.displayName+subData?.name" [iconWidth]="'16px'" tooltipTitle=""
+            tooltipPlacement="bottom" (click)="onActionSelect(action,subData)"
+            [attr.id]="'action-dropdown'+i+id"></rds-button>
+
+          <!-- <rds-button colorVariant="default" [size]="'small'" [isFabIcon]="true" tooltipTitle="This is tooltip" 
+          tooltipPlacement="right" buttonId="" iconHeight="18px" iconWidth="18px" [isIconFill]="false" icon="plus">
+          </rds-button>
+          
+          <rds-button (click)="onActionSelect(action,subData)"  [attr.aria-label]="'Update'+action.displayName+subData?.name" [size]="'small'"
+          class="px-2" [colorVariant]="'primary'" [isOutline]="true"  data-bs-dismiss="modal" aria-label="Close">
+      </rds-button> -->
+          <!-- <rds-button [label]="translate.instant('Delete')"  [size]="'small'" class="px-2" [colorVariant]="'primary'"
+      (click)="onActionSelect(action,subData)" data-bs-dismiss="modal" aria-label="Close">
+      </rds-button> -->
+        </ng-container>
+
+      </div>
+      <ng-container *ngIf="showConfirmationPopup">
+        <rds-comp-alert-popup [alertID]="'deleteModal'" (onCancel)="close()" (onSuccess)="delete()"
+          [alertData]="alertData">
+        </rds-comp-alert-popup>
+      </ng-container>
+      <ng-template #editActionTemplate>
+        <div class="d-flex">
+          <rds-button class="action" [colorVariant]="'primary'" [isFabIcon]="true" [size]="'medium'" [icon]="'check'"
+            [iconHeight]="'13px'" [iconWidth]="'20px'" (click)="saveChanges(subData)">
+          </rds-button>
+
+          <rds-button class="ms-2 text-white" (click)="closeEdit(subData)" [isFabIcon]="true" [tooltipPlacement]="'top'"
+            [colorVariant]="'danger'" [size]="'medium'" [icon]="'close'" [iconHeight]="'10px'" [iconWidth]="'15px'">
+          </rds-button>
+        </div>
+      </ng-template>
+    </td>
+  </tr>
+  </ng-container>
+  </tbody>
+  </table>
+  </td>
+  </tr>
+  </ng-container>
   </tbody>
   </table>
 </div>
@@ -166,7 +347,6 @@
         <rds-icon name="file_plus" height="100px" width="100px"></rds-icon>
       </div>
       <div>
-        <!-- <h5> {{noDataTitle|translate}} </h5> -->
         <h5><rds-label [label]="translate.instant(noDataTitle)"></rds-label></h5>
         <div *ngIf="showNodataSubtitle">
           <small class="text-muted">

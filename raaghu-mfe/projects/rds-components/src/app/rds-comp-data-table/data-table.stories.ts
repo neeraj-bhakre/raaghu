@@ -20,15 +20,17 @@ export default {
 } as Meta;
 
 const Template: Story<RdsDataTableComponent> = (args: RdsDataTableComponent) => ({
-  props:{
+  props: {
     ...args
-}
+  }
 });
 
 export const Default = Template.bind({});
 
 Default.args = {
-  tableHeaders : [{ displayName: 'Edition Name', key: 'editionName', dataType: 'text', dataLength: 30, required: true, sortable: true }, { displayName: 'Price ($)', key: 'price', dataType: 'number', dataLength: 5, required: false, sortable: true }, { displayName: 'Trial Period(Day(s))', key: 'trialPeriod', dataType: 'number', dataLength: 5, required: true }],
+  tableHeaders: [{ displayName: 'Edition Name', key: 'editionName', dataType: 'text', dataLength: 30, required: true, sortable: true },
+  { displayName: 'Price ($)', key: 'price', dataType: 'number', dataLength: 5, required: false, sortable: true },
+  { displayName: 'Trial Period(Day(s))', key: 'trialPeriod', dataType: 'number', dataLength: 5, required: true }],
   tableData: [
     { id: 1, editionName: 'Standard', price: 60, trialPeriod: 5 },
     { id: 2, editionName: 'Basic', price: 120, trialPeriod: 10 },
@@ -48,80 +50,111 @@ Default.args = {
     { id: 16, editionName: 'Basic', price: 100, trialPeriod: 1 },
   ],
   actions: [{ id: 'delete', displayName: 'Delete' }, { id: 'edit', displayName: 'Edit' }],
-  pagination : true
+  pagination: true
 
 }
 
 export const RadioTable = Template.bind({});
 RadioTable.args = {
-  tableHeaders : [{ displayName: 'Problem Name', key: 'problemName', dataType: 'text', dataLength: 30, required: true, sortable: true }, 
-  { displayName: 'Problem Status', key: 'problemStatus', dataType: 'radio', required: false, sortable: true }, 
- ],
-  tableData: [
-    { id: 1, problemName: 'Standard', problemStatus: [{
-      id: 1,
-      label: "Radio Button 1 ",
-      checked: false,
-      name: "Standard",
-      disabled: false
-    },
-    {
-      id: 2,
-      label: "Radio Button 2",
-      checked: false,
-      name: "Standard",
-      disabled: false
-    },
-    {
-      id: 3,
-      label: "Radio Button 3",
-      checked: false,
-      name: "Standard"
-    }]},
-    { id: 2, problemName: 'Basic',  problemStatus: [{
-      id: 4,
-      label: "Radio Button 1 ",
-      checked: false,
-      name: "Basic"
-    },
-    {
-      id: 5,
-      label: "Radio Button 2",
-      checked: false,
-      name: "Basic"
-    },
-    {
-      id: 6,
-      label: "Radio Button 3",
-      checked: false,
-      name: "Basic",
-      disabled: false
-    }] },
-    { id: 3, problemName: 'Premium',  problemStatus: [{
-      id: 7,
-      label: "Radio Button 1 ",
-      checked: false,
-      name: "Premium"
-    },
-    {
-      id: 8,
-      label: "Radio Button 2",
-      checked: false,
-      name: "Premium"
-    },
-    {
-      id: 9,
-      label: "Radio Button 3",
-      checked: false,
-      name: "Premium"
-    },
-    {
-      id: 10,
-      label: "Radio Button 4",
-      checked: false,
-      name: "Premium"
-    }]}
+  tableHeaders: [{ displayName: 'Problem Name', key: 'problemName', dataType: 'text', dataLength: 30, required: true, sortable: true },
+  { displayName: 'Problem Status', key: 'problemStatus', dataType: 'radio', required: false, sortable: true },
   ],
-  pagination : true,
-  isDisabled : false
+  tableData: [
+    {
+      id: 1, problemName: 'Standard', problemStatus: [{
+        id: 1,
+        label: "Radio Button 1 ",
+        checked: false,
+        name: "Standard",
+        disabled: false
+      },
+      {
+        id: 2,
+        label: "Radio Button 2",
+        checked: false,
+        name: "Standard",
+        disabled: false
+      },
+      {
+        id: 3,
+        label: "Radio Button 3",
+        checked: false,
+        name: "Standard"
+      }]
+    },
+    {
+      id: 2, problemName: 'Basic', problemStatus: [{
+        id: 4,
+        label: "Radio Button 1 ",
+        checked: false,
+        name: "Basic"
+      },
+      {
+        id: 5,
+        label: "Radio Button 2",
+        checked: false,
+        name: "Basic"
+      },
+      {
+        id: 6,
+        label: "Radio Button 3",
+        checked: false,
+        name: "Basic",
+        disabled: false
+      }]
+    },
+    {
+      id: 3, problemName: 'Premium', problemStatus: [{
+        id: 7,
+        label: "Radio Button 1 ",
+        checked: false,
+        name: "Premium"
+      },
+      {
+        id: 8,
+        label: "Radio Button 2",
+        checked: false,
+        name: "Premium"
+      },
+      {
+        id: 9,
+        label: "Radio Button 3",
+        checked: false,
+        name: "Premium"
+      },
+      {
+        id: 10,
+        label: "Radio Button 4",
+        checked: false,
+        name: "Premium"
+      }]
+    }
+  ],
+  pagination: true,
+  isDisabled: false
+}
+
+export const ExpandableTable = Template.bind({});
+ExpandableTable.args = {
+  tableHeaders: [{
+    displayName: 'Edition Name', key: 'editionName', dataType: 'expand', dataLength: 30, required: true, sortable: true,
+  },
+  { displayName: 'Price ($)', key: 'price', dataType: 'number', dataLength: 5, required: false, sortable: true },
+  { displayName: 'Trial Period(Day(s))', key: 'trialPeriod', dataType: 'number', dataLength: 5, required: true }],
+  tableData: [
+    {
+      id: 1, editionName: 'Standard', price: 60, trialPeriod: 5, expanded: false,
+      children: [{ displayName: 'Test1', key: 'test1', dataType: 'text', dataLength: 30, required: true, sortable: true },
+      { displayName: 'Test2', key: 'test2', dataType: 'number', dataLength: 5, required: false, sortable: true },
+      { displayName: 'Test3', key: 'test3', dataType: 'number', dataLength: 5, required: true }],
+      childrens: [
+        { id: 1, test1: 'data1', test2: 60, test3: 5 },
+        { id: 2, test1: 'data2', test2: 120, test3: 10 },
+      ],
+      actions: [{ id: 'edit', displayName: 'Edit',icon: 'edit' },{ id: 'delete', displayName: 'Delete', icon: 'delete'  } ],
+    },
+  ],
+  actions: [{ id: 'delete', displayName: 'Delete' }, { id: 'edit', displayName: 'Edit' }],
+  pagination: true
+
 }
