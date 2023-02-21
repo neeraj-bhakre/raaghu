@@ -4,9 +4,6 @@
 name: Build and deploy ABP-DEMO-UI-MAIN-ABP-BRANCH
 
 on:
-  push:
-    branches:
-      - development-abp
   workflow_dispatch:
   
 env:
