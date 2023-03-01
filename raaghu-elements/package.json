@@ -68,7 +68,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
-    "ng-packagr": "13.0.0",
+    "ng-packagr": "15.2.2",
     "storybook-addon-themes": "^6.1.0",
     "typescript": "4.8.2"
   },
